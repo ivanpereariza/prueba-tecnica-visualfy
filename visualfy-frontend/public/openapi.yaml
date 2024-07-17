@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: Visualfy
+  version: 0.1.0
+servers:
+  - url: http://localhost:5000/
+tags:
+  - name: alertas
+    description: Endpoints relacionados con las alertas
+paths:
+  /api/alerts:
+    get:
+      tags:
+        - alertas
+      summary: GET todas las alertas
+      description: >-
+        Recibir todas las alertas con posibilidad de filtrarlas por name o priority
+      operationId: getAlerts
+      parameters:
+        - name: name
+          in: query
+          description: Nombre para filtrar
+          schema:
+            type: string
+          example: 'alarma'
+        - name: priority
+          in: query
+          description: Prioridad para filtrar
+          schema:
+            type: string
+          example: '1,2,5'
+      responses:
+        '200':
+          description: Alertas recibidas correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alerts'
+        '500':
+          description: Problema con el servidor
+    post:
+      tags:
+        - alertas
+      summary: POST nueva alerta
+      description: >-
+        Crear una nueva alerta
+      operationId: postAlert
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - type
+                - title
+                - priority
+              properties:
+                type:
+                  type: string
+                  example: dog
+                  description: Tipo de alerta
+                title:
+                  type: string
+                  example: Perro ladrando
+                  description: Nombre de la alerta
+                file:
+                  type: string
+                  format: binary
+                  description: Archivo de imagen en formato binario
+                priority:
+                  type: number
+                  example: 5
+                  description: Prioridad de la alerta
+                  enum: [1, 2, 3, 4, 5]
+      responses:
+        '201':
+          description: Alerta creada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 201
+                  data:
+                    type: object
+                    properties:
+                      alert:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            example: dog
+                          title:
+                            type: string
+                            example: Perro ladrando
+                          image:
+                            type: string
+                            example: www.cdn.img
+                          data:
+                            type: object
+                            properties:
+                              last_month_hints:
+                                type: number
+                                example: 0
+                      priority:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            example: dog
+                          priority:
+                            type: number
+                            example: 5
+        '400':
+          description: Faltan campos obligatorios
+        '500':
+          description: Problema con el servidor
+components:
+  schemas:
+    Alerts:
+      type: object
+      properties:
+        status:
+          type: number
+          example: 200
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: dog
+              title:
+                type: string
+                example: Perro ladrando
+              image:
+                type: string
+                example: www.cdn.img
+              data:
+                type: object
+                properties:
+                  last_month_hints:
+                    type: number
+                    example: 25478
